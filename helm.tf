@@ -29,7 +29,7 @@ resource "helm_release" "hello_world" {
   namespace = kubernetes_namespace.vic-ns.metadata[0].name
 
   values = [
-    file("${path.module}/hello-values.yaml")
+    templatefile("${path.module}/hello-values.yaml",{ host = "${data.kubernetes_ingress_v1.ingress_hostname.status.0.load_balancer.0.ingress.0.hostname}" })
   ]
 }
 
