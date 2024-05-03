@@ -40,7 +40,7 @@ data "kubernetes_ingress_v1" "ingress_hostname" {
   }
 }
 
-output "kubernetes_ingress" {
+output "AWS_kubernetes_ingress" {
   description   = "External DN name of load balancer"
   value         = data.kubernetes_ingress_v1.ingress_hostname.status.0.load_balancer.0.ingress.0.hostname
 }

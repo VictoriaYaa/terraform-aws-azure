@@ -1,7 +1,7 @@
 locals {
   cluster_name = "eks-vic"
 }
-
+# Infra: VPC, Subnets, Security Groups and EKS
 data "aws_availability_zones" "available" {
   filter {
     name   = "opt-in-status"
@@ -86,7 +86,7 @@ data "aws_eks_cluster_auth" "cluster" {
 }
 
 
-# Role
+# Roles for ALB controller
 data "aws_iam_policy_document" "kubernetes_alb_controller_assume" {
   count = var.enabled ? 1 : 0
 
