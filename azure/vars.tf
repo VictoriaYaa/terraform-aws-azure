@@ -31,3 +31,20 @@ variable "username" {
 }
 
 variable "namespace" { type = string}
+
+variable "service_account_name" {
+  type        = string
+  default     = "load-balancer-controller"
+  description = "ALB Controller service account name"
+}
+
+variable "enabled" {
+  type        = bool
+  default     = true
+  description = "Variable indicating whether deployment is enabled."
+}
+
+variable "mod_dependency" {
+  default     = null
+  description = "Dependence variable binds all AWS resources allocated by this module, dependent modules reference this variable."
+}
