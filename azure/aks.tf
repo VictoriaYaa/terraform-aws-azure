@@ -27,7 +27,7 @@ resource "azapi_resource" "ssh_public_key" {
   ]
 }
 
-output "key_data" {
+output "azure_key_data" {
   value = "${azapi_resource_action.ssh_public_key_gen.output.publicKey}"
 
   sensitive = true
@@ -83,10 +83,5 @@ resource "azurerm_kubernetes_cluster" "k8s" {
   }
 }
 
-# Outputs
-output "kubernetes_cluster_name" {
-  value = azurerm_kubernetes_cluster.k8s.name
-}
-output "resource_group_name" {
-  value = azurerm_resource_group.rg.name
-}
+
+
