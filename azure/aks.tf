@@ -55,6 +55,19 @@ resource "random_pet" "azurerm_kubernetes_cluster_dns_prefix" {
   prefix = "dns"
 }
 
+
+provider "kubernetes" {
+  host                   = data.azurerm_kubernetes_cluster.k8s.kube_config.0.host
+  client_certificate     = base64decode(data.azurerm_kubernetes_cluster.k8s.kube_config.0.client_certificate)
+  client_key             = base64decode(data.azurerm_kubernetes_cluster.k8s.kube_config.0.client_key)
+  cluster_ca_certificate = base64decode(data.azurerm_kubernetes_cluster.k8s.kube_config.0.cluster_ca_certificate)
+}
+
+data "azurerm_kubernetes_cluster" "k8s" {
+  name                = azurerm_kubernetes_cluster.k8s.name
+  resource_group_name = azurerm_resource_group.rg.name
+}
+
 resource "azurerm_kubernetes_cluster" "k8s" {
   location            = azurerm_resource_group.rg.location
   name                = random_pet.azurerm_kubernetes_cluster_name.id
@@ -78,8 +91,9 @@ resource "azurerm_kubernetes_cluster" "k8s" {
     }
   }
   network_profile {
-    network_plugin    = "kubenet"
+    network_plugin    = "azure"
     load_balancer_sku = "standard"
+    network_policy    = "calico"
   }
 }
 

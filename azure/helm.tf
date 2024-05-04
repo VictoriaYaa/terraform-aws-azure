@@ -1,10 +1,10 @@
 # Helm
 
-resource "kubernetes_namespace" "vic-ns" {
-  metadata {
-    name = var.namespace
-  }
-}
+# resource "kubernetes_namespace" "vic-ns" {
+#   metadata {
+#     name = var.namespace
+#   }
+# }
 
 data "azurerm_kubernetes_cluster" "credentials" {
   name                = azurerm_kubernetes_cluster.k8s.name
