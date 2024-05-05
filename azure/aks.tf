@@ -95,7 +95,69 @@ resource "azurerm_kubernetes_cluster" "k8s" {
     load_balancer_sku = "standard"
     network_policy    = "calico"
   }
+  ingress_application_gateway {
+    subnet_id = azurerm_subnet.subnet_appgw.id
+  }
 }
 
+data "azurerm_subscription" "current" {}
+data "azurerm_client_config" "current" {}
+
+
+# Create a vnet.
+resource "azurerm_virtual_network" "vn" {
+  location            = var.resource_group_location
+  resource_group_name = azurerm_resource_group.rg.name
+  name                = "vnet-aks"
+  address_space       = ["192.168.0.0/16"]
+}
+
+# Create a subnet for aks nodes and pods.
+resource "azurerm_subnet" "subnet_aks" {
+  resource_group_name  = azurerm_resource_group.rg.name
+  name                 = "snet-aks"
+  virtual_network_name = azurerm_virtual_network.vn.name
+  address_prefixes     = ["192.168.1.0/24"]
+}
+
+# Create a subnet for application gateway.
+resource "azurerm_subnet" "subnet_appgw" {
+  resource_group_name  = azurerm_resource_group.rg.name
+  name                 = "snet-appgw"
+  virtual_network_name = azurerm_virtual_network.vn.name
+  address_prefixes     = ["192.168.2.0/24"]
+}
+
+
+# Required to set access policy on key vault.
+output "aks_uai_agentpool_object_id" { value = azurerm_kubernetes_cluster.k8s.kubelet_identity[0].object_id }
+
+# Required when setting up csi driver secret provier class.
+output "aks_uai_agentpool_client_id" { value = azurerm_kubernetes_cluster.k8s.kubelet_identity[0].client_id }
+
+# Required to set IAM role on appgw subnet.
+output "aks_uai_appgw_object_id" { value = azurerm_kubernetes_cluster.k8s.ingress_application_gateway[0].ingress_application_gateway_identity[0].object_id }
+
+
+resource "azurerm_role_assignment" "contributor-to-aks-ingress-on-appgw-vnet" {
+  scope                = azurerm_virtual_network.vn.id
+  role_definition_name = "Contributor"
+  principal_id         = azurerm_kubernetes_cluster.k8s.ingress_application_gateway[0].ingress_application_gateway_identity[0].object_id
+}
+
+data "azurerm_application_gateway" "ag" {
+  name                = azurerm_kubernetes_cluster.k8s.ingress_application_gateway[0].gateway_name
+  resource_group_name = "MC_${azurerm_kubernetes_cluster.k8s.resource_group_name}_${azurerm_kubernetes_cluster.k8s.name}_${azurerm_kubernetes_cluster.k8s.location}"
+}
+
+data "azurerm_public_ip" "public_ip" {
+  name                = "applicationgateway-appgwpip"
+  resource_group_name = data.azurerm_application_gateway.ag.resource_group_name
+}
+
+output "Azure_ag_hostname" {
+  description   = "External DN name of load balancer"
+  value = data.azurerm_public_ip.public_ip.fqdn
+}
 
 
