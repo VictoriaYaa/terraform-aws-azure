@@ -1,22 +1,6 @@
 replicaCount: 1
-ingress:
-  enabled: true
-  className: azure-application-gateway
-  hosts:
-  #   - host: "${host}"
-  #     paths:
-  #       - path: /
-  #         pathType: ImplementationSpecific
-    http:
-      paths:
-      - pathType: Prefix
-        path: /
-  annotations:
-        kubernetes.io/ingress.class: azure/application-gateway
-        appgw.ingress.kubernetes.io/health-probe-path: "/"
-        appgw.ingress.kubernetes.io/backend-path-prefix: /
-        appgw.ingress.kubernetes.io/backend-protocol: "http"
 service:
+  type: LoadBalancer
   port: 80
   targetport: 80
 

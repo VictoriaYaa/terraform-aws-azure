@@ -22,9 +22,6 @@ resource "helm_release" "hello_world_azure" {
   chart      = "hello"
   namespace = "default"
 
-  # values = [
-  #   templatefile("${path.module}/hello-values-azure.yaml",{ host = "${data.azurerm_public_ip.public_ip.fqdn}" })
-  # ]
   values = [
     file("${path.module}/hello-values-azure.yaml")
   ]

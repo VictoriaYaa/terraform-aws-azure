@@ -155,9 +155,9 @@ data "azurerm_public_ip" "public_ip" {
   resource_group_name = data.azurerm_application_gateway.ag.resource_group_name
 }
 
-output "Azure_ag_hostname" {
+output "Azure_ag_IP_address" {
   description   = "External DN name of load balancer"
-  value = data.azurerm_public_ip.public_ip.fqdn
+  value = data.azurerm_public_ip.public_ip.ip_address
 }
 
 
